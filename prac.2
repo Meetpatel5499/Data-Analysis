@@ -1,0 +1,176 @@
+DATABASE
+-- Customers Table
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    RegistrationDate DATE NOT NULL
+);
+
+-- Orders Table
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT NOT NULL,
+    OrderDate DATE NOT NULL,
+    TotalAmount DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+-- Employees Table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Department VARCHAR(100) NOT NULL,
+    HireDate DATE NOT NULL,
+    Salary DECIMAL(10,2) NOT NULL
+);
+
+
+
+Table Data
+INSERT INTO Customers (FirstName, LastName, Email, RegistrationDate) VALUES
+('John', 'Doe', 'john.doe@email.com', '2022-03-15'),
+('Jane', 'Smith', 'jane.smith@email.com', '2021-11-02'),
+('Michael', 'Brown', 'michael.brown@email.com', '2023-01-10'),
+('Emily', 'Johnson', 'emily.johnson@email.com', '2022-07-21'),
+('David', 'Williams', 'david.williams@email.com', '2023-05-30');
+
+INSERT INTO Orders (CustomerID, OrderDate, TotalAmount) VALUES
+(1, '2023-07-01', 150.50),
+(2, '2023-07-03', 200.75),
+(3, '2023-07-05', 99.99),
+(4, '2023-07-08', 450.00),
+(5, '2023-07-10', 320.25);
+
+INSERT INTO Employees (FirstName, LastName, Department, HireDate, Salary) VALUES
+('Alice', 'Taylor', 'HR', '2021-06-15', 55000.00),
+('Robert', 'Miller', 'IT', '2022-02-01', 65000.00),
+('Sophia', 'Anderson', 'Finance', '2020-11-20', 72000.00),
+('Daniel', 'Thomas', 'Marketing', '2023-01-05', 48000.00),
+('Olivia', 'Jackson', 'Sales', '2022-09-10', 51000.00);
+
+
+
+
+
+Q.1
+SELECT o.OrderID, o.OrderDate, o.TotalAmount,
+       c.CustomerID, c.FirstName, c.LastName, c.Email
+FROM Orders o
+INNER JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+
+Q.2
+SELECT c.CustomerID, c.FirstName, c.LastName,
+       o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+
+Q.3
+SELECT c.CustomerID, c.FirstName, c.LastName,
+       o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers c
+RIGHT JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+Q.4
+SELECT c.CustomerID, c.FirstName, c.LastName,
+       o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+UNION
+SELECT c.CustomerID, c.FirstName, c.LastName,
+       o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers c
+RIGHT JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+
+Q.5
+SELECT c.CustomerID, c.FirstName, c.LastName, SUM(o.TotalAmount) AS TotalSpent
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName, c.LastName
+HAVING SUM(o.TotalAmount) > (SELECT AVG(TotalAmount) FROM Orders);
+
+Q.6
+SELECT EmployeeID, FirstName, LastName, Department, Salary
+FROM Employees
+WHERE Salary > (SELECT AVG(Salary) FROM Employees);
+
+
+Q.7
+SELECT OrderID, CustomerID,
+       YEAR(OrderDate) AS OrderYear,
+       MONTH(OrderDate) AS OrderMonth
+FROM Orders;
+
+
+Q.8
+SELECT OrderID, OrderDate,
+       DATEDIFF(CURDATE(), OrderDate) AS DaysSinceOrder
+FROM Orders;
+
+
+Q.9
+SELECT OrderID, DATE_FORMAT(OrderDate, '%d-%m-%Y') AS FormattedDate
+FROM Orders;
+
+
+Q.10
+SELECT CustomerID, CONCAT(FirstName, ' ', LastName) AS FullName
+FROM Customers;
+
+
+Q.11
+SELECT REPLACE(FirstName, 'John', 'Jonathan') AS UpdatedName
+FROM Customers;
+
+
+Q.12
+SELECT UPPER(FirstName) AS UpperFirst,
+       LOWER(LastName) AS LowerLast
+FROM Customers;
+
+
+Q.13
+SELECT TRIM(Email) AS CleanedEmail
+FROM Customers;
+
+
+Q.14
+SELECT OrderID, CustomerID, OrderDate, TotalAmount,
+       SUM(TotalAmount) OVER (ORDER BY OrderDate) AS RunningTotal
+FROM Orders;
+
+
+Q.15
+SELECT OrderID, CustomerID, TotalAmount,
+       RANK() OVER (ORDER BY TotalAmount DESC) AS RankByAmount
+FROM Orders;
+
+
+Q.16
+SELECT OrderID, CustomerID, TotalAmount,
+       CASE
+           WHEN TotalAmount > 400 THEN '10% Off'
+           WHEN TotalAmount > 200 THEN '5% Off'
+           ELSE 'No Discount'
+       END AS Discount
+FROM Orders;
+
+
+Q.17
+SELECT EmployeeID, FirstName, LastName, Salary,
+       CASE
+           WHEN Salary > 60000 THEN 'High'
+           WHEN Salary BETWEEN 40000 AND 60000 THEN 'Medium'
+           ELSE 'Low'
+       END AS SalaryCategory
+FROM Employees;
+
+
+
+
+
